@@ -203,9 +203,78 @@ a{color:var(--au);}
 /* ── TOAST ── */
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--surf2);border:1px solid var(--bdr2);border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;color:var(--txt);z-index:300;animation:fadeInOut 2.2s ease forwards;white-space:nowrap;}
 @keyframes fadeInOut{0%{opacity:0;transform:translateX(-50%) translateY(8px)}15%{opacity:1;transform:translateX(-50%) translateY(0)}80%{opacity:1}100%{opacity:0}}
+
+/* ── PASSWORD GATE ── */
+#pw-gate {
+  position:fixed;inset:0;z-index:9999;
+  background:var(--bg);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:32px 24px;
+  gap:0;
+}
+.pw-logo {
+  font-size:22px;font-weight:800;letter-spacing:-.3px;margin-bottom:8px;
+}
+.pw-logo .ph{color:var(--ph);}
+.pw-logo .au{color:var(--au);}
+.pw-sub {
+  font-size:11px;color:var(--mut);letter-spacing:.08em;text-transform:uppercase;
+  margin-bottom:40px;font-family:monospace;
+}
+.pw-box {
+  background:var(--surf);border:1px solid var(--bdr);border-radius:16px;
+  padding:24px 22px;width:100%;max-width:340px;
+}
+.pw-box h2 {
+  font-size:16px;font-weight:700;margin-bottom:4px;
+}
+.pw-box p {
+  font-size:12px;color:var(--mut2);margin-bottom:18px;
+}
+.pw-input {
+  width:100%;padding:13px 14px;border-radius:10px;
+  border:1px solid var(--bdr2);background:var(--surf2);
+  color:var(--txt);font-size:16px;font-family:inherit;
+  outline:none;transition:border-color .15s;
+  -webkit-appearance:none;
+}
+.pw-input:focus { border-color:var(--ph); }
+.pw-input.error { border-color:var(--red); }
+.pw-submit {
+  width:100%;margin-top:10px;padding:14px;border-radius:10px;border:none;
+  background:var(--ph);color:var(--bg);font-size:15px;font-weight:700;
+  font-family:inherit;cursor:pointer;transition:opacity .15s;min-height:50px;
+}
+.pw-submit:active { opacity:.8; }
+.pw-err {
+  font-size:12px;color:var(--red);margin-top:10px;text-align:center;
+  min-height:18px;
+}
+.pw-hint {
+  font-size:11px;color:var(--mut);text-align:center;margin-top:16px;
+}
 </style>
 </head>
 <body>
+
+<!-- PASSWORD GATE -->
+<div id="pw-gate">
+  <div class="pw-logo">MJP <span class="ph">Job</span> <span class="au">Finder</span></div>
+  <div class="pw-sub">🇵🇭 Philippines · 🇦🇺 Australia</div>
+  <div class="pw-box">
+    <h2>🔒 Enter Password</h2>
+    <p>This app is private. Enter the password to continue.</p>
+    <input class="pw-input" type="password" id="pw-input" placeholder="Password"
+      onkeydown="if(event.key==='Enter')checkPw()"
+      oninput="document.getElementById('pw-input').classList.remove('error');document.getElementById('pw-err').textContent=''"
+    >
+    <button class="pw-submit" onclick="checkPw()">Unlock →</button>
+    <div class="pw-err" id="pw-err"></div>
+  </div>
+  <div class="pw-hint">Share this link only with MJP</div>
+</div>
+
 <div class="app">
 
   <!-- TOP BAR -->
@@ -352,6 +421,32 @@ a{color:var(--au);}
 </div>
 
 <script>
+
+// ── PASSWORD GATE ──
+// Change this to whatever password you want
+const APP_PASSWORD = 'mjpjobs2026';
+
+function checkPw() {
+  const input = document.getElementById('pw-input');
+  const val = input.value.trim();
+  if (val === APP_PASSWORD) {
+    sessionStorage.setItem('mjp_auth', '1');
+    document.getElementById('pw-gate').style.display = 'none';
+  } else {
+    input.classList.add('error');
+    document.getElementById('pw-err').textContent = 'Incorrect password. Please try again.';
+    input.value = '';
+    input.focus();
+  }
+}
+
+// Check if already authenticated this session
+if (sessionStorage.getItem('mjp_auth') === '1') {
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('pw-gate').style.display = 'none';
+  });
+}
+
 // ── CONFIG ──
 const RAPIDAPI_KEY = '9e7e8367c2msh02482275225f93ap1656a9jsnb7c9961e9130';
 const JSEARCH_HOST = 'jsearch.p.rapidapi.com';
