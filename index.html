@@ -254,6 +254,15 @@ a{color:var(--au);}
 .pw-hint {
   font-size:11px;color:var(--mut);text-align:center;margin-top:16px;
 }
+
+/* ── SELECT ALL BTN ── */
+.sel-all-row { display:flex; gap:8px; margin-bottom:10px; }
+.sel-all-btn {
+  padding:6px 12px; border-radius:8px; border:1px solid var(--bdr2);
+  background:transparent; color:var(--mut2); font-size:12px; font-weight:600;
+  cursor:pointer; font-family:inherit; transition:all .15s;
+}
+.sel-all-btn:active { opacity:.7; }
 </style>
 </head>
 <body>
@@ -292,14 +301,18 @@ a{color:var(--au);}
     <!-- ═══ PHILIPPINES ═══ -->
     <div class="panel active" id="panel-ph">
       <div class="sec">Role titles</div>
+      <div class="sel-all-row">
+        <button class="sel-all-btn" onclick="selectAll('ph')">✓ Select All</button>
+        <button class="sel-all-btn" onclick="deselectAll('ph')">✕ Deselect All</button>
+      </div>
       <div class="role-grid" id="ph-role-grid"></div>
-      <button class="search-btn ph" id="ph-btn" onclick="doSearch('ph')">🔍 Search Live Jobs</button>
+      <button class="search-btn ph" id="ph-btn" onclick="doSearch('ph')">🔍 Get Search Links</button>
       <div id="ph-results" style="margin-top:18px">
         <div class="empty">Select roles above and tap <strong>Search Live Jobs</strong> to load real listings from JobStreet PH, Indeed PH &amp; LinkedIn.</div>
       </div>
       <div class="tips" id="ph-tips">
         <div class="tips-title">🇵🇭 Philippines Tips</div>
-        <div class="tip"><span class="tip-arrow" style="color:var(--ph)">→</span><span>Results come from Google for Jobs — pulling from JobStreet PH, Indeed PH, and LinkedIn</span></div>
+        <div class="tip"><span class="tip-arrow" style="color:var(--ph)">→</span><span>Tap <strong>Get Search Links</strong> — the app generates pre-filtered search URLs for JobStreet PH, LinkedIn, and Indeed PH, ready to copy and open</span></div>
         <div class="tip"><span class="tip-arrow" style="color:var(--ph)">→</span><span>Key targets: PLDT/Smart, DITO, Converge ICT, Ericsson PH, Nokia PH, Huawei PH</span></div>
         <div class="tip"><span class="tip-arrow" style="color:var(--ph)">→</span><span>Best areas: Makati, BGC (Taguig), Muntinlupa, Mandaluyong</span></div>
         <div class="tip"><span class="tip-arrow" style="color:var(--ph)">→</span><span>Tap <strong>✍ Cover Letter</strong> on any listing for an AI-drafted letter using MJP's full CV</span></div>
@@ -309,6 +322,10 @@ a{color:var(--au);}
     <!-- ═══ AUSTRALIA ═══ -->
     <div class="panel" id="panel-au">
       <div class="sec">Role titles</div>
+      <div class="sel-all-row">
+        <button class="sel-all-btn" onclick="selectAll('au')">✓ Select All</button>
+        <button class="sel-all-btn" onclick="deselectAll('au')">✕ Deselect All</button>
+      </div>
       <div class="role-grid" id="au-role-grid"></div>
       <button class="search-btn au" id="au-btn" onclick="doSearch('au')">🔍 Search Live Jobs</button>
       <div id="au-results" style="margin-top:18px">
@@ -473,6 +490,32 @@ const AU_ROLES = ['Telecommunications Engineer','RF Engineer','RAN Optimization 
 const phActive = new Set(['RF Network Engineer','Mobile Network Manager','Telecom Service Manager','5G Network Engineer']);
 const auActive = new Set(['Telecommunications Engineer','RAN Optimization Engineer','5G Network Engineer','Telecom Service Manager']);
 
+
+// ── SELECT / DESELECT ALL ──
+const PH_ROLES_REF = ['RF Network Engineer','Network Optimization Engineer','RAN Engineer','Mobile Network Manager','Service Quality Manager','Telecom Service Manager','Network Performance Manager','Wireless Network Engineer','Senior RF Engineer','5G Network Engineer','Spectrum Engineer','Network Operations Manager'];
+const AU_ROLES_REF = ['Telecommunications Engineer','RF Engineer','RAN Optimization Engineer','Network Performance Engineer','Mobile Network Engineer','Senior Network Engineer','5G Network Engineer','Telecom Service Manager','Network Quality Manager','Radio Network Planner','Wireless Engineer','Field Network Engineer'];
+
+function selectAll(region) {
+  const activeSet = region === 'ph' ? phActive : auActive;
+  const allRoles = region === 'ph' ? PH_ROLES_REF : AU_ROLES_REF;
+  allRoles.forEach(r => activeSet.add(r));
+  rebuildRoleTags(region);
+}
+
+function deselectAll(region) {
+  const activeSet = region === 'ph' ? phActive : auActive;
+  activeSet.clear();
+  rebuildRoleTags(region);
+}
+
+function rebuildRoleTags(region) {
+  const gridId = region + '-role-grid';
+  const activeSet = region === 'ph' ? phActive : auActive;
+  const allRoles = region === 'ph' ? PH_ROLES_REF : AU_ROLES_REF;
+  document.getElementById(gridId).innerHTML = '';
+  renderRoles(gridId, allRoles, activeSet, region);
+}
+
 // ── RENDER ROLE TAGS ──
 function renderRoles(gridId, roles, activeSet, region) {
   const el = document.getElementById(gridId);
@@ -500,130 +543,109 @@ function switchTab(id) {
 
 
 function buildSearchLinks(region, roles) {
-  const q = encodeURIComponent((roles[0]||'Telecommunications Engineer'));
-  const links = region === 'ph' ? [
-    ['LinkedIn PH', `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent((roles[0]||'').replace(/ /g,'+'))}&location=Metro+Manila`],
-    ['JobStreet PH', `https://ph.jobstreet.com/${q}-jobs`],
-    ['Indeed PH', `https://ph.indeed.com/jobs?q=${q}&l=Metro+Manila`],
-  ] : [
-    ['Seek AU', `https://www.seek.com.au/${q.replace(/%20/g,'-')}-jobs/in-All-Melbourne`],
-    ['LinkedIn AU', `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent((roles[0]||'').replace(/ /g,'+'))}&location=Melbourne`],
-    ['Indeed AU', `https://au.indeed.com/jobs?q=${q}&l=Melbourne`],
-  ];
-  return links.map(([name,url]) =>
-    `<div style="margin-top:8px">
-      <div style="font-size:12px;font-weight:600;color:var(--txt);margin-bottom:4px">${name}</div>
-      <div style="display:flex;gap:6px;align-items:center">
-        <div style="flex:1;background:var(--surf2);border:1px solid var(--bdr2);border-radius:6px;padding:7px 10px;font-family:monospace;font-size:10px;color:var(--mut2);word-break:break-all">${url}</div>
-        <button onclick="navigator.clipboard.writeText('${url}').then(()=>showToast('Copied!'))"
-          style="padding:7px 10px;border-radius:6px;border:none;background:var(--surf2);color:var(--mut2);font-size:11px;cursor:pointer;flex-shrink:0">📋</button>
-      </div>
-    </div>`
-  ).join('');
+  const q = encodeURIComponent(roles[0] || 'Telecommunications Engineer');
+  const qMulti = encodeURIComponent((roles.slice(0,2).join(' ')));
+  if (region === 'ph') {
+    return [
+      ['JobStreet PH', `https://ph.jobstreet.com/${(roles[0]||'telecommunications-engineer').toLowerCase().replace(/ /g,'-')}-jobs`],
+      ['LinkedIn PH', `https://www.linkedin.com/jobs/search/?keywords=${qMulti}&location=Metro%20Manila%2C%20Philippines&sortBy=DD`],
+      ['Indeed PH', `https://ph.indeed.com/jobs?q=${q}&l=Metro+Manila&sort=date`],
+    ];
+  } else {
+    return [
+      ['Seek AU', `https://www.seek.com.au/${(roles[0]||'telecommunications-engineer').toLowerCase().replace(/ /g,'-')}-jobs/in-All-Melbourne`],
+      ['LinkedIn AU', `https://www.linkedin.com/jobs/search/?keywords=${qMulti}&location=Melbourne%2C+Australia&sortBy=DD`],
+      ['Indeed AU', `https://au.indeed.com/jobs?q=${q}&l=Melbourne%2C+VIC&sort=date`],
+    ];
+  }
 }
 
-function renderJobs(jobs, wrap, region, roles) {
-      const now = Date.now()/1000;
-      let html = `<div class="status-bar">✅ ${jobs.length} real listings · newest first · ${new Date().toLocaleTimeString()}</div>`;
-      jobs.forEach(j => {
-        const ts = j.job_posted_at_timestamp;
-        const h = ts ? Math.floor((now-ts)/3600) : null;
-        const d = h ? Math.floor(h/24) : null;
-        let age = 'Recently', ageCls = 'old';
-        if (h !== null) {
-          if (h < 1) { age = 'Just posted'; ageCls = 'fresh'; }
-          else if (h < 24) { age = h+'h ago'; ageCls = 'fresh'; }
-          else if (d === 1) { age = '1 day ago'; ageCls = 'recent'; }
-          else if (d < 7) { age = d+' days ago'; ageCls = 'recent'; }
-          else if (d < 14) { age = '1 week ago'; }
-          else { age = Math.floor(d/7)+' weeks ago'; }
-        }
-        const salary = fmtSalary(j);
-        const skills = (j.job_required_skills||[]).slice(0,4).map(s=>`<span class="job-tag">${esc(s)}</span>`).join('');
-        const srcCls = region === 'ph' ? 'src-ph' : 'src-au';
-        const clCls = region === 'ph' ? 'ph' : 'au';
-        const applyLink = j.job_apply_link || '';
-        const safeTitle = esc(j.job_title||'');
-        const safeComp = esc(j.employer_name||'');
-        const safeLoc = esc(j.job_city || j.job_state || (region==='ph'?'Philippines':'Australia'));
-        const safeDesc = esc((j.job_description||'').replace(/\n+/g,' ').slice(0,300));
-        const safeApply = esc(applyLink);
-        const safeDescCL = (j.job_description||'').replace(/'/g,"\\'").replace(/\n+/g,' ').slice(0,500);
-
-        html += `<div class="job-card">
-          <div class="job-top">
-            <div class="job-title">${safeTitle}</div>
-            <div class="job-age ${ageCls}">${age}</div>
-          </div>
-          <div class="job-meta">
-            <span class="job-company">${safeComp}</span>
-            <span style="color:var(--bdr2)">·</span>
-            <span class="job-loc">📍 ${safeLoc}</span>
-            ${salary ? `<span style="color:var(--bdr2)">·</span><span class="job-salary">${esc(salary)}</span>` : ''}
-          </div>
-          <div class="job-desc">${safeDesc}</div>
-          ${skills ? `<div class="job-tags">${skills}</div>` : ''}
-          <div class="job-footer">
-            <div style="display:flex;align-items:center;gap:10px">
-              <span class="src-badge ${srcCls}">${esc(j.job_publisher||'Indeed')}</span>
-              ${applyLink ? `<button class="apply-btn ${clCls}" onclick="copyLink('${safeApply}')">↗ Copy link</button>` : ''}
-            </div>
-            <button class="cl-btn ${clCls}" onclick="openCL('${safeTitle.replace(/'/g,"\\'")}','${safeComp.replace(/'/g,"\\'")}','${safeLoc.replace(/'/g,"\\'")}','${safeDescCL}','${region}')">✍ Cover Letter</button>
-          </div>
-        </div>`;
-      });
-      wrap.innerHTML = html;
+function renderSearchLinks(region, roles, wrap) {
+  const links = buildSearchLinks(region, roles);
+  const rcol = region === 'ph' ? 'var(--ph)' : 'var(--au)';
+  let html = `
+    <div style="margin-top:4px">
+      <div style="font-size:11px;color:var(--mut);font-family:monospace;margin-bottom:14px;padding:9px 12px;background:var(--surf);border:1px solid var(--bdr);border-radius:8px;line-height:1.6">
+        ℹ️ Tap a board below to get your search URL, then paste it into your browser.<br>
+        Results open directly on the job board — real, live listings.
+      </div>`;
+  links.forEach(([name, url]) => {
+    html += `
+      <div style="margin-bottom:10px;background:var(--surf);border:1px solid var(--bdr);border-radius:12px;padding:13px 14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+          <span style="font-weight:700;font-size:14px">${name}</span>
+          <button onclick="copyAndToast('${url.replace(/'/g, "\\'")}')"
+            style="padding:9px 16px;border-radius:8px;border:none;background:${rcol};color:var(--bg);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit">
+            📋 Copy Link
+          </button>
+        </div>
+        <div style="font-family:monospace;font-size:10px;color:var(--mut2);margin-top:8px;word-break:break-all;line-height:1.5">${url}</div>
+      </div>`;
+  });
+  html += '</div>';
+  wrap.innerHTML = html;
 }
 
-// ── SEARCH ──
+function copyAndToast(url) {
+  navigator.clipboard.writeText(url).then(() => showToast('✅ Link copied — paste into your browser!'));
+}
+
 async function doSearch(region) {
   const activeSet = region === 'ph' ? phActive : auActive;
   const btn = document.getElementById(region + '-btn');
   const wrap = document.getElementById(region + '-results');
+  const roles = [...activeSet];
 
-  if (!activeSet.size) { showToast('Select at least one role title'); return; }
+  if (!roles.length) { showToast('Select at least one role title'); return; }
 
+  // Philippines: Google for Jobs has very limited PH coverage — use direct search links
+  if (region === 'ph') {
+    renderSearchLinks('ph', roles, wrap);
+    return;
+  }
+
+  // Australia: use JSearch (Google for Jobs has good AU coverage)
   btn.disabled = true;
   btn.textContent = 'Searching…';
-  wrap.innerHTML = `<div class="loading"><div class="spinner" style="border-top-color:${region==='ph'?'var(--ph)':'var(--au)'}"></div><div>Fetching live listings…</div></div>`;
+  wrap.innerHTML = `<div class="loading"><div class="spinner" style="border-top-color:var(--au)"></div><div>Fetching live listings…</div></div>`;
 
-  // Use single most-relevant role for better results, broaden location
-  const roles = [...activeSet];
-  // Try primary role first, fall back to broader telecom term
-  const primaryRole = roles[0] || 'Telecommunications Engineer';
-  const loc = region === 'ph' ? 'Philippines' : 'Australia';
-  const country = region === 'ph' ? 'ph' : 'au';
-  // Keep query simple — JSearch works best with concise queries
-  const query = primaryRole + ' ' + loc;
-  const url = `https://${JSEARCH_HOST}/search?query=${encodeURIComponent(query)}&page=1&num_pages=3&country=${country}&date_posted=all`;
+  // Simple, reliable query format for JSearch
+  const primaryRole = roles[0];
+  const url = `https://${JSEARCH_HOST}/search?query=${encodeURIComponent(primaryRole + ' in Melbourne Australia')}&page=1&num_pages=2&date_posted=all`;
 
   try {
     const res = await fetch(url, { headers: { 'x-rapidapi-host': JSEARCH_HOST, 'x-rapidapi-key': RAPIDAPI_KEY } });
     if (!res.ok) throw new Error('API ' + res.status);
     const data = await res.json();
-    const jobs = (data.data || []).sort((a,b) => (b.job_posted_at_timestamp||0) - (a.job_posted_at_timestamp||0));
+    let jobs = (data.data || []).sort((a,b) => (b.job_posted_at_timestamp||0) - (a.job_posted_at_timestamp||0));
 
     if (!jobs.length) {
-      // Auto-retry with a broader generic query before giving up
-      const fallbackQuery = region === 'ph' ? 'Telecommunications Engineer Philippines' : 'Telecommunications Engineer Australia';
-      const fallbackUrl = `https://${JSEARCH_HOST}/search?query=${encodeURIComponent(fallbackQuery)}&page=1&num_pages=3&country=${country}&date_posted=all`;
-      const res2 = await fetch(fallbackUrl, { headers: { 'x-rapidapi-host': JSEARCH_HOST, 'x-rapidapi-key': RAPIDAPI_KEY } });
+      // Retry with generic telecom query
+      const res2 = await fetch(`https://${JSEARCH_HOST}/search?query=${encodeURIComponent('telecommunications engineer Melbourne Australia')}&page=1&num_pages=3&date_posted=all`,
+        { headers: { 'x-rapidapi-host': JSEARCH_HOST, 'x-rapidapi-key': RAPIDAPI_KEY } });
       const data2 = await res2.json();
-      const jobs2 = (data2.data || []).sort((a,b) => (b.job_posted_at_timestamp||0) - (a.job_posted_at_timestamp||0));
-      if (!jobs2.length) {
-        wrap.innerHTML = '<div class="empty">No listings found right now. JSearch coverage varies by region — try again shortly, or use the search links below.<br><br>' + buildSearchLinks(region, roles) + '</div>';
-        btn.disabled = false; btn.textContent = '🔄 Retry'; return;
-      }
-      // Use fallback results
-      renderJobs(jobs2, wrap, region, roles);
-      showToast('Showing broader telecom results');
-      btn.disabled = false; btn.textContent = '🔄 Refresh'; return;
+      jobs = (data2.data || []).sort((a,b) => (b.job_posted_at_timestamp||0) - (a.job_posted_at_timestamp||0));
+    }
+
+    if (!jobs.length) {
+      // JSearch also came up empty — fall back to search links
+      wrap.innerHTML = `<div class="empty" style="text-align:left;padding:16px">
+        <div style="font-weight:700;margin-bottom:8px">No live listings found via API right now.</div>
+        <div style="font-size:12px;color:var(--mut2);margin-bottom:14px">Use these direct links to search on the actual job boards:</div>
+      </div>`;
+      const linksWrap = document.createElement('div');
+      wrap.appendChild(linksWrap);
+      renderSearchLinks('au', roles, linksWrap);
     } else {
-      renderJobs(jobs, wrap, region, roles);
+      renderJobs(jobs, wrap, 'au', roles);
     }
   } catch(e) {
-    const msg = e.message.includes('429') ? 'Rate limit reached — wait a minute and try again.' : 'Could not fetch listings: ' + e.message;
+    const msg = e.message.includes('429') ? 'Rate limit reached — wait a minute and try again.' : 'Could not fetch: ' + e.message;
     wrap.innerHTML = `<div class="err-box">⚠️ ${msg}</div>`;
+    // Still show search links below the error
+    const linksWrap = document.createElement('div');
+    wrap.appendChild(linksWrap);
+    renderSearchLinks('au', roles, linksWrap);
   }
 
   btn.disabled = false;
