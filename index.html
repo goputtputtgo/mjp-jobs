@@ -8,842 +8,246 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MJP Jobs">
 <meta name="theme-color" content="#07090f">
-<title>MJP Job Finder</title>
-<link rel="manifest" href="manifest.json">
+<title>MJP Job Finder · Philippines</title>
 <style>
 :root {
   --bg:#07090f; --surf:#0d1320; --surf2:#111b2e;
   --bdr:#1a2640; --bdr2:#243350;
   --txt:#dde4f0; --mut:#5a6e90; --mut2:#8899bb;
-  --ph:#f59e0b; --au:#34d399; --visa:#a78bfa; --red:#f87171;
+  --ph:#f59e0b; --red:#f87171;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Segoe UI',system-ui,sans-serif;font-size:15px;line-height:1.5;-webkit-text-size-adjust:100%;}
 button{font-family:inherit;cursor:pointer;}
-a{color:var(--au);}
-
-/* ── LAYOUT ── */
+a{color:var(--ph);}
 .app{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;}
-
-.topbar{
-  position:sticky;top:0;z-index:100;
-  background:var(--surf);border-bottom:1px solid var(--bdr);
-  padding:12px 16px;
-  display:flex;align-items:center;justify-content:space-between;
-  gap:12px;
-}
-.topbar h1{font-size:18px;font-weight:800;letter-spacing:-.3px;line-height:1;}
-.topbar h1 .ph{color:var(--ph);}
-.topbar h1 .au{color:var(--au);}
+.topbar{position:sticky;top:0;z-index:100;background:var(--surf);border-bottom:1px solid var(--bdr);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.topbar-left h1{font-size:18px;font-weight:800;letter-spacing:-.3px;line-height:1;}
+.topbar-left h1 span{color:var(--ph);}
 .topbar-sub{font-size:10px;color:var(--mut);letter-spacing:.08em;text-transform:uppercase;margin-top:2px;}
-.ava{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--ph),var(--au));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:var(--bg);flex-shrink:0;}
-
-/* ── BOTTOM NAV ── */
-.bottom-nav{
-  position:fixed;bottom:0;left:0;right:0;z-index:100;
-  background:var(--surf);border-top:1px solid var(--bdr);
-  display:flex;
-  padding-bottom:var(--safe-bottom);
-}
-.nav-btn{
-  flex:1;padding:10px 4px 12px;border:none;background:transparent;
-  color:var(--mut);font-size:10px;font-weight:600;letter-spacing:.04em;
-  text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:4px;
-  transition:color .15s;
-}
-.nav-btn .nav-icon{font-size:20px;line-height:1;}
-.nav-btn.active{color:var(--txt);}
-.nav-btn.active.ph{color:var(--ph);}
-.nav-btn.active.au{color:var(--au);}
-.nav-btn.active.visa{color:var(--visa);}
-
-/* ── CONTENT ── */
-.content{flex:1;padding:16px 14px 100px;max-width:720px;margin:0 auto;width:100%;}
-
-/* ── PANEL ── */
-.panel{display:none;}
-.panel.active{display:block;}
-
-/* ── SECTION LABEL ── */
+.ava{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--ph),#f97316);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:var(--bg);flex-shrink:0;}
+.content{flex:1;padding:16px 14px 32px;max-width:720px;margin:0 auto;width:100%;}
 .sec{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--mut);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
 .sec::after{content:'';flex:1;height:1px;background:var(--bdr);}
-
-/* ── ROLE TAGS ── */
+.sel-row{display:flex;gap:8px;margin-bottom:10px;}
+.sel-btn{padding:6px 14px;border-radius:8px;border:1px solid var(--bdr2);background:transparent;color:var(--mut2);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;}
+.sel-btn:hover{border-color:var(--ph);color:var(--ph);}
 .role-grid{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px;}
-.role-tag{
-  padding:8px 13px;border-radius:9px;border:1px solid var(--bdr);
-  background:var(--surf);color:var(--txt);font-size:13px;font-weight:500;
-  transition:all .15s;min-height:38px;display:flex;align-items:center;gap:5px;
-}
-.role-tag.on-ph{background:var(--surf2);border-color:rgba(245,158,11,.5);color:var(--ph);}
-.role-tag.on-au{background:var(--surf2);border-color:rgba(52,211,153,.5);color:var(--au);}
-
-/* ── SEARCH BUTTON ── */
-.search-btn{
-  width:100%;padding:14px;border-radius:12px;border:none;
-  font-size:15px;font-weight:700;letter-spacing:.02em;
-  transition:all .15s;margin-top:4px;min-height:50px;
-}
-.search-btn.ph{background:var(--ph);color:var(--bg);}
-.search-btn.au{background:var(--au);color:var(--bg);}
+.role-tag{padding:8px 13px;border-radius:9px;border:1px solid var(--bdr);background:var(--surf);color:var(--txt);font-size:13px;font-weight:500;transition:all .15s;min-height:38px;display:flex;align-items:center;gap:5px;}
+.role-tag.on{background:var(--surf2);border-color:rgba(245,158,11,.5);color:var(--ph);}
+.search-btn{width:100%;padding:14px;border-radius:12px;border:none;font-size:15px;font-weight:700;letter-spacing:.02em;transition:all .15s;margin-top:4px;min-height:50px;background:var(--ph);color:var(--bg);}
 .search-btn:disabled{background:var(--bdr2);color:var(--mut);cursor:not-allowed;}
-
-/* ── STATUS BAR ── */
-.status-bar{font-size:11px;color:var(--mut);font-family:monospace;margin:12px 0;padding:9px 12px;background:var(--surf);border:1px solid var(--bdr);border-radius:8px;}
-
-/* ── JOB CARD ── */
-.job-card{
-  background:var(--surf);border:1px solid var(--bdr);
-  border-radius:14px;padding:14px 14px 12px;
-  margin-bottom:10px;transition:border-color .2s;
-}
-.job-top{display:flex;justify-content:space-between;gap:10px;margin-bottom:5px;}
-.job-title{font-weight:700;font-size:14px;line-height:1.35;flex:1;}
-.job-age{font-family:monospace;font-size:10px;white-space:nowrap;flex-shrink:0;margin-top:2px;}
-.job-age.fresh{color:var(--au);}
-.job-age.recent{color:var(--ph);}
-.job-age.old{color:var(--mut);}
-.job-meta{font-size:12px;color:var(--mut2);margin-bottom:7px;display:flex;flex-wrap:wrap;gap:4px;align-items:center;}
-.job-company{font-weight:600;}
-.job-loc{color:var(--mut);}
-.job-salary{color:var(--au);font-weight:600;font-size:11px;}
-.job-desc{font-size:12px;color:var(--mut2);line-height:1.55;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
-.job-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
-.job-tag{font-family:monospace;font-size:10px;padding:3px 8px;border-radius:5px;background:var(--surf2);color:var(--mut2);border:1px solid var(--bdr2);}
-.job-footer{display:flex;align-items:center;justify-content:space-between;margin-top:11px;gap:8px;}
-.src-badge{font-family:monospace;font-size:9px;padding:3px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:.05em;}
-.src-ph{background:rgba(245,158,11,.1);color:var(--ph);border:1px solid rgba(245,158,11,.25);}
-.src-au{background:rgba(52,211,153,.1);color:var(--au);border:1px solid rgba(52,211,153,.25);}
-.apply-btn{font-size:12px;font-weight:600;background:none;border:none;padding:0;color:inherit;}
-.apply-btn.ph{color:var(--ph);}
-.apply-btn.au{color:var(--au);}
-.cl-btn{
-  padding:8px 14px;border-radius:8px;border:none;font-size:12px;font-weight:600;
-  min-height:36px;display:flex;align-items:center;gap:5px;
-}
-.cl-btn.ph{background:rgba(245,158,11,.15);color:var(--ph);}
-.cl-btn.au{background:rgba(52,211,153,.12);color:var(--au);}
-
-/* ── EMPTY / LOADING / ERROR ── */
-.empty{text-align:center;padding:40px 16px;background:var(--surf);border:1px solid var(--bdr);border-radius:14px;color:var(--mut);font-size:13px;line-height:1.6;}
-.loading{text-align:center;padding:40px 16px;color:var(--mut);font-size:13px;}
-.err-box{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);border-radius:12px;padding:14px;font-size:13px;color:var(--red);margin-bottom:14px;}
-@keyframes spin{to{transform:rotate(360deg)}}
-.spinner{width:30px;height:30px;border:2px solid var(--bdr2);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px;}
-
-/* ── TIPS ── */
-.tips{background:var(--surf);border:1px solid var(--bdr);border-radius:14px;padding:14px;margin-top:16px;}
+.roles-bar{margin-bottom:16px;padding:10px 13px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:10px;}
+.roles-bar-label{font-size:10px;font-family:monospace;text-transform:uppercase;letter-spacing:.08em;color:var(--ph);margin-bottom:6px;}
+.roles-chips{display:flex;flex-wrap:wrap;gap:5px;}
+.role-chip{font-size:11px;padding:3px 9px;border-radius:6px;background:rgba(245,158,11,.12);color:var(--ph);border:1px solid rgba(245,158,11,.25);}
+.board-cards{display:flex;flex-direction:column;gap:12px;margin-bottom:20px;}
+.board-card{background:var(--surf);border:1px solid var(--bdr);border-radius:14px;overflow:hidden;transition:border-color .2s;}
+.board-card:hover{border-color:rgba(245,158,11,.3);}
+.board-header{display:flex;align-items:center;gap:14px;padding:14px 16px;}
+.board-logo{width:44px;height:44px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px;border:1px solid var(--bdr2);background:var(--surf2);}
+.board-name{font-weight:700;font-size:15px;margin-bottom:2px;}
+.board-desc{font-size:11.5px;color:var(--mut2);line-height:1.4;}
+.role-links{border-top:1px solid var(--bdr);padding:10px 14px;display:flex;flex-direction:column;gap:8px;}
+.role-link-row{display:flex;align-items:center;gap:8px;}
+.role-link-label{font-size:12.5px;color:var(--txt);flex:1;min-width:0;}
+.open-btn{padding:7px 13px;border-radius:8px;border:none;background:rgba(245,158,11,.15);color:var(--ph);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:opacity .15s;text-decoration:none;display:inline-flex;align-items:center;gap:4px;}
+.open-btn:hover{opacity:.8;}
+.tips{background:var(--surf);border:1px solid var(--bdr);border-radius:14px;padding:14px;margin-top:4px;}
 .tips-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--mut2);margin-bottom:10px;}
 .tip{display:flex;gap:8px;font-size:12.5px;color:var(--mut2);line-height:1.5;margin-bottom:7px;}
-.tip-arrow{flex-shrink:0;margin-top:2px;}
-
-/* ── MODAL ── */
-.modal-overlay{
-  position:fixed;inset:0;z-index:200;
-  background:rgba(0,0,0,.85);backdrop-filter:blur(8px);
-  display:flex;align-items:flex-end;justify-content:center;
-  padding:0;
-}
-.modal-sheet{
-  background:var(--surf);border-top:1px solid var(--bdr2);
-  border-radius:20px 20px 0 0;
-  width:100%;max-width:720px;
-  max-height:92vh;max-height:92dvh;
-  display:flex;flex-direction:column;
-  animation:slideUp .25s ease;
-}
-@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.modal-handle{width:36px;height:4px;background:var(--bdr2);border-radius:2px;margin:10px auto 0;}
-.modal-head{padding:14px 16px 12px;border-bottom:1px solid var(--bdr);}
-.modal-head h2{font-size:16px;font-weight:800;}
-.modal-head p{font-size:12px;color:var(--mut);margin-top:3px;}
-.modal-head-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
-.modal-close{background:var(--surf2);border:1px solid var(--bdr);width:32px;height:32px;border-radius:8px;color:var(--mut);font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.modal-body{flex:1;overflow-y:auto;padding:14px 16px 24px;}
-.cl-text{white-space:pre-wrap;font-size:13px;line-height:1.8;color:var(--txt);background:var(--surf2);border:1px solid var(--bdr);border-radius:12px;padding:16px;margin-bottom:14px;}
-.modal-actions{display:flex;gap:8px;flex-wrap:wrap;}
-.modal-action-btn{padding:12px 18px;border-radius:10px;border:none;font-size:13px;font-weight:700;min-height:46px;}
-.btn-visa{background:var(--visa);color:var(--bg);}
-.btn-ghost{background:transparent;border:1px solid var(--bdr2);color:var(--mut2);}
-
-/* ── VISA ── */
-.visa-hero{background:linear-gradient(135deg,rgba(167,139,250,.1),rgba(167,139,250,.03));border:1px solid rgba(167,139,250,.25);border-radius:16px;padding:18px;margin-bottom:20px;}
-.visa-hero h2{font-size:19px;font-weight:800;line-height:1.2;margin-bottom:6px;}
-.visa-hero h2 span{color:var(--visa);}
-.visa-alert{font-size:12.5px;color:var(--au);background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);border-radius:8px;padding:10px 12px;margin-top:10px;line-height:1.5;}
-.visa-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:20px;}
-@media(min-width:520px){.visa-grid{grid-template-columns:1fr 1fr;}}
-.visa-card{background:var(--surf);border:1px solid var(--bdr);border-radius:14px;padding:14px;}
-.visa-icon-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
-.visa-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);}
-.visa-code{font-family:monospace;font-size:10px;color:var(--visa);}
-.visa-name{font-weight:700;font-size:13px;}
-.visa-desc{font-size:12px;color:var(--mut2);line-height:1.55;margin-bottom:10px;}
-.vtags{display:flex;flex-wrap:wrap;gap:5px;}
-.vtag{font-family:monospace;font-size:10px;padding:3px 8px;border-radius:5px;border:1px solid;}
-.vtag-g{background:rgba(52,211,153,.08);color:var(--au);border-color:rgba(52,211,153,.2);}
-.vtag-w{background:rgba(245,158,11,.08);color:var(--ph);border-color:rgba(245,158,11,.2);}
-
-.pts-table{background:var(--surf);border:1px solid var(--bdr);border-radius:14px;overflow:hidden;margin-bottom:20px;}
-.pts-table table{width:100%;border-collapse:collapse;font-size:12px;}
-.pts-table th{padding:10px 12px;text-align:left;font-family:monospace;font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);background:var(--surf2);border-bottom:1px solid var(--bdr);}
-.pts-table td{padding:10px 12px;border-bottom:1px solid var(--bdr);vertical-align:top;line-height:1.4;}
-.pts-table tr:last-child td{border-bottom:none;}
-.pts-val{font-family:monospace;font-size:11px;font-weight:700;white-space:nowrap;}
-
-.warn-box{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:13px;font-size:12.5px;color:var(--mut2);line-height:1.6;margin-bottom:20px;}
-.steps{margin-bottom:20px;}
-.step{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--bdr);}
-.step:last-child{border-bottom:none;}
-.step-num{width:26px;height:26px;border-radius:50%;flex-shrink:0;background:var(--surf2);border:1px solid rgba(167,139,250,.3);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;color:var(--visa);margin-top:1px;}
-.step-title{font-weight:700;font-size:13px;margin-bottom:3px;}
-.step-body{font-size:12px;color:var(--mut2);line-height:1.55;}
-
-/* ── TOAST ── */
-.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--surf2);border:1px solid var(--bdr2);border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;color:var(--txt);z-index:300;animation:fadeInOut 2.2s ease forwards;white-space:nowrap;}
+.tip:last-child{margin-bottom:0;}
+.tip-arrow{flex-shrink:0;margin-top:2px;color:var(--ph);}
+.err-box{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);border-radius:12px;padding:14px;font-size:13px;color:var(--red);}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--surf2);border:1px solid var(--bdr2);border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;color:var(--txt);z-index:300;animation:fadeInOut 2.2s ease forwards;white-space:nowrap;}
 @keyframes fadeInOut{0%{opacity:0;transform:translateX(-50%) translateY(8px)}15%{opacity:1;transform:translateX(-50%) translateY(0)}80%{opacity:1}100%{opacity:0}}
-
-/* ── PASSWORD GATE ── */
-#pw-gate {
-  position:fixed;inset:0;z-index:9999;
-  background:var(--bg);
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  padding:32px 24px;
-  gap:0;
-}
-.pw-logo {
-  font-size:22px;font-weight:800;letter-spacing:-.3px;margin-bottom:8px;
-}
-.pw-logo .ph{color:var(--ph);}
-.pw-logo .au{color:var(--au);}
-.pw-sub {
-  font-size:11px;color:var(--mut);letter-spacing:.08em;text-transform:uppercase;
-  margin-bottom:40px;font-family:monospace;
-}
-.pw-box {
-  background:var(--surf);border:1px solid var(--bdr);border-radius:16px;
-  padding:24px 22px;width:100%;max-width:340px;
-}
-.pw-box h2 {
-  font-size:16px;font-weight:700;margin-bottom:4px;
-}
-.pw-box p {
-  font-size:12px;color:var(--mut2);margin-bottom:18px;
-}
-.pw-input {
-  width:100%;padding:13px 14px;border-radius:10px;
-  border:1px solid var(--bdr2);background:var(--surf2);
-  color:var(--txt);font-size:16px;font-family:inherit;
-  outline:none;transition:border-color .15s;
-  -webkit-appearance:none;
-}
-.pw-input:focus { border-color:var(--ph); }
-.pw-input.error { border-color:var(--red); }
-.pw-submit {
-  width:100%;margin-top:10px;padding:14px;border-radius:10px;border:none;
-  background:var(--ph);color:var(--bg);font-size:15px;font-weight:700;
-  font-family:inherit;cursor:pointer;transition:opacity .15s;min-height:50px;
-}
-.pw-submit:active { opacity:.8; }
-.pw-err {
-  font-size:12px;color:var(--red);margin-top:10px;text-align:center;
-  min-height:18px;
-}
-.pw-hint {
-  font-size:11px;color:var(--mut);text-align:center;margin-top:16px;
-}
-
-/* ── SELECT ALL BTN ── */
-.sel-all-row { display:flex; gap:8px; margin-bottom:10px; }
-.sel-all-btn {
-  padding:6px 12px; border-radius:8px; border:1px solid var(--bdr2);
-  background:transparent; color:var(--mut2); font-size:12px; font-weight:600;
-  cursor:pointer; font-family:inherit; transition:all .15s;
-}
-.sel-all-btn:active { opacity:.7; }
-
-/* ── PH LINK LAUNCHER ── */
-.launcher-intro {
-  background:var(--surf);border:1px solid var(--bdr);border-radius:12px;
-  padding:13px 14px;margin-bottom:18px;font-size:12.5px;color:var(--mut2);line-height:1.6;
-}
-.launcher-intro strong { color:var(--txt); }
-.launcher-query-box {
-  background:var(--surf2);border:1px solid var(--bdr2);border-radius:10px;
-  padding:10px 13px;margin:10px 0 18px;font-family:monospace;font-size:11px;
-  color:var(--ph);line-height:1.6;word-break:break-all;
-}
-.board-cards { display:flex;flex-direction:column;gap:10px; }
-.board-launch-card {
-  display:flex;align-items:center;gap:14px;
-  background:var(--surf);border:1px solid var(--bdr);border-radius:14px;
-  padding:14px 16px;text-decoration:none;color:var(--txt);
-  transition:all .18s;-webkit-tap-highlight-color:transparent;
-  cursor:pointer;
-}
-.board-launch-card:active { opacity:.75;transform:scale(.98); }
-.board-launch-card.ph-card:hover,
-.board-launch-card.ph-card:focus { border-color:rgba(245,158,11,.45);background:rgba(245,158,11,.05); }
-.board-logo {
-  width:44px;height:44px;border-radius:12px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  font-size:22px;border:1px solid var(--bdr2);background:var(--surf2);
-}
-.board-info { flex:1;min-width:0; }
-.board-info-name { font-weight:700;font-size:15px;margin-bottom:2px; }
-.board-info-desc { font-size:11.5px;color:var(--mut2);line-height:1.4; }
-.board-arrow {
-  font-size:20px;color:var(--ph);flex-shrink:0;
-  font-weight:300;
-}
-.active-roles-bar {
-  margin-bottom:16px;padding:10px 13px;
-  background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);
-  border-radius:10px;
-}
-.active-roles-bar-label {
-  font-family:monospace;font-size:10px;text-transform:uppercase;
-  letter-spacing:.08em;color:var(--ph);margin-bottom:6px;
-}
-.active-roles-chips { display:flex;flex-wrap:wrap;gap:5px; }
-.active-role-chip {
-  font-size:11px;padding:3px 9px;border-radius:6px;
-  background:rgba(245,158,11,.12);color:var(--ph);
-  border:1px solid rgba(245,158,11,.25);
-}
+.empty{text-align:center;padding:40px 16px;background:var(--surf);border:1px solid var(--bdr);border-radius:14px;color:var(--mut);font-size:13px;line-height:1.6;}
 </style>
 </head>
 <body>
-
-<!-- PASSWORD GATE -->
-<div id="pw-gate">
-  <div class="pw-logo">MJP <span class="ph">Job</span> <span class="au">Finder</span></div>
-  <div class="pw-sub">🇵🇭 Philippines · 🇦🇺 Australia</div>
-  <div class="pw-box">
-    <h2>🔒 Enter Password</h2>
-    <p>This app is private. Enter the password to continue.</p>
-    <input class="pw-input" type="password" id="pw-input" placeholder="Password"
-      onkeydown="if(event.key==='Enter')checkPw()"
-      oninput="document.getElementById('pw-input').classList.remove('error');document.getElementById('pw-err').textContent=''"
-    >
-    <button class="pw-submit" onclick="checkPw()">Unlock →</button>
-    <div class="pw-err" id="pw-err"></div>
-  </div>
-  <div class="pw-hint">Share this link only with MJP</div>
-</div>
-
 <div class="app">
-
-  <!-- TOP BAR -->
   <div class="topbar">
-    <div>
-      <h1>MJP <span class="ph">Job</span> <span class="au">Finder</span></h1>
-      <div class="topbar-sub">Live listings · PH &amp; AU</div>
+    <div class="topbar-left">
+      <h1>MJP <span>Job Finder</span></h1>
+      <div class="topbar-sub">🇵🇭 Metro Manila · Telecom &amp; RF</div>
     </div>
     <div class="ava">MJP</div>
   </div>
 
-  <!-- CONTENT -->
   <div class="content">
+    <div class="sec">Role titles</div>
+    <div class="sel-row">
+      <button class="sel-btn" onclick="selectAll()">✓ Select All</button>
+      <button class="sel-btn" onclick="deselectAll()">✕ Deselect All</button>
+    </div>
+    <div class="role-grid" id="role-grid"></div>
+    <button class="search-btn" id="search-btn" onclick="generateLinks()">🔍 Generate Search Links</button>
 
-    <!-- ═══ PHILIPPINES ═══ -->
-    <div class="panel active" id="panel-ph">
-      <div class="sec">Role titles</div>
-      <div class="sel-all-row">
-        <button class="sel-all-btn" onclick="selectAll('ph')">✓ Select All</button>
-        <button class="sel-all-btn" onclick="deselectAll('ph')">✕ Deselect All</button>
-      </div>
-      <div class="role-grid" id="ph-role-grid"></div>
-      <button class="search-btn ph" id="ph-btn" onclick="doSearch('ph')">🔍 Generate Search Links</button>
-      <div id="ph-results" style="margin-top:18px">
-        <div class="empty">
-          <div style="font-size:28px;margin-bottom:10px">🇵🇭</div>
-          <div style="font-weight:700;margin-bottom:6px">Ready to search</div>
-          Select the role titles you want above, then tap <strong>Generate Search Links</strong> to get one-tap links to JobStreet PH, LinkedIn, Indeed PH and Kalibrr — all pre-filtered for your roles.
-        </div>
-      </div>
-      <div class="tips" id="ph-tips">
-        <div class="tips-title">🇵🇭 How to use this tab</div>
-        <div class="tip"><span class="tip-arrow" style="color:var(--ph)">→</span><span>Select the role titles you want above, then tap <strong>Generate Search Links</strong></span></div>
-        <div class="tip"><span class="tip-arrow" style="color:var(--ph)">→</span><span>Tap any board card — it opens that job board in a new tab with your roles already searched</span></div>
-        <div class="tip"><span class="tip-arrow" style="color:var(--ph)">→</span><span>On each site, filter by <strong>Date Posted</strong> to see the freshest listings first</span></div>
-        <div class="tip"><span class="tip-arrow" style="color:var(--ph)">→</span><span>Key targets: PLDT/Smart, DITO, Converge ICT, Ericsson PH, Nokia PH, Huawei PH</span></div>
-        <div class="tip"><span class="tip-arrow" style="color:var(--ph)">→</span><span>Best areas: Makati, BGC (Taguig), Muntinlupa, Mandaluyong</span></div>
+    <div id="results" style="margin-top:20px">
+      <div class="empty">
+        <div style="font-size:28px;margin-bottom:10px">🇵🇭</div>
+        <div style="font-weight:700;margin-bottom:6px">Ready to search</div>
+        Select roles above and tap <strong>Generate Search Links</strong>.<br>
+        Each board shows a direct link per role — one tap opens live results.
       </div>
     </div>
 
-    <!-- ═══ AUSTRALIA ═══ -->
-    <div class="panel" id="panel-au">
-      <div class="sec">Role titles</div>
-      <div class="sel-all-row">
-        <button class="sel-all-btn" onclick="selectAll('au')">✓ Select All</button>
-        <button class="sel-all-btn" onclick="deselectAll('au')">✕ Deselect All</button>
-      </div>
-      <div class="role-grid" id="au-role-grid"></div>
-      <button class="search-btn au" id="au-btn" onclick="doSearch('au')">🔍 Search Live Jobs</button>
-      <div id="au-results" style="margin-top:18px">
-        <div class="empty">Select roles above and tap <strong>Search Live Jobs</strong> to load real listings from Seek, Indeed AU &amp; LinkedIn.</div>
-      </div>
-      <div class="tips">
-        <div class="tips-title">🇦🇺 Australia Tips</div>
-        <div class="tip"><span class="tip-arrow" style="color:var(--au)">→</span><span>Results come from Google for Jobs — pulling from Seek, Indeed AU, and LinkedIn</span></div>
-        <div class="tip"><span class="tip-arrow" style="color:var(--au)">→</span><span>Key targets: Telstra, Optus, TPG Telecom, Ericsson AU, Nokia AU, Ventia, Downer Group</span></div>
-        <div class="tip"><span class="tip-arrow" style="color:var(--au)">→</span><span>Melbourne is best for telecom roles + family cost-of-living balance</span></div>
-        <div class="tip"><span class="tip-arrow" style="color:var(--au)">→</span><span>Expected salary: AUD $120k–$160k + super for senior engineer/manager level</span></div>
-        <div class="tip"><span class="tip-arrow" style="color:var(--au)">→</span><span>Australia is mid-5G rollout — his LTE/5G optimization experience is in high demand</span></div>
-      </div>
-    </div>
-
-    <!-- ═══ VISA ═══ -->
-    <div class="panel" id="panel-visa">
-      <div class="visa-hero">
-        <h2>Australian Visa<br><span>Pathway Analysis</span></h2>
-        <p style="font-size:13px;color:var(--mut2);margin-top:6px">Based on MJP's profile: 13+ yrs telecom, Bachelor's degree, Filipino citizen, exploring options.</p>
-        <div class="visa-alert">✅ <strong>Good news:</strong> Telecommunications Engineer (ANZSCO 263311) is on Australia's MLTSSL — MJP can apply for permanent residency without a job offer.</div>
-      </div>
-
-      <div class="sec">Visa pathways</div>
-      <div class="visa-grid">
-        <div class="visa-card">
-          <div class="visa-icon-row"><div class="visa-icon">🌏</div><div><div class="visa-code">Subclass 189</div><div class="visa-name">Skilled Independent</div></div></div>
-          <div class="visa-desc">Points-based permanent residency. No employer or state sponsor needed. Best if MJP scores 65+ points.</div>
-          <div class="vtags"><span class="vtag vtag-g">No job offer needed</span><span class="vtag vtag-g">Permanent PR</span><span class="vtag vtag-w">Competitive pool</span></div>
-        </div>
-        <div class="visa-card">
-          <div class="visa-icon-row"><div class="visa-icon">🏛️</div><div><div class="visa-code">Subclass 190</div><div class="visa-name">State Nominated</div></div></div>
-          <div class="visa-desc">State nominates you for +5 pts. Commit to live in that state 2 years. Easier threshold than 189.</div>
-          <div class="vtags"><span class="vtag vtag-g">+5 bonus points</span><span class="vtag vtag-g">Permanent PR</span><span class="vtag vtag-w">State residency req.</span></div>
-        </div>
-        <div class="visa-card">
-          <div class="visa-icon-row"><div class="visa-icon">🤝</div><div><div class="visa-code">Subclass 482</div><div class="visa-name">TSS — Employer Sponsored</div></div></div>
-          <div class="visa-desc">Employer sponsors for up to 4 years. Fastest path if an AU employer offers a role. Can lead to PR.</div>
-          <div class="vtags"><span class="vtag vtag-g">Fast if sponsored</span><span class="vtag vtag-w">Needs AU employer</span><span class="vtag vtag-w">Temporary 4yr</span></div>
-        </div>
-        <div class="visa-card">
-          <div class="visa-icon-row"><div class="visa-icon">⭐</div><div><div class="visa-code">Subclass 186</div><div class="visa-name">Employer Nomination PR</div></div></div>
-          <div class="visa-desc">Permanent employer-sponsored visa. Usually follows 2+ years on a 482. Requires skills assessment.</div>
-          <div class="vtags"><span class="vtag vtag-g">Permanent PR</span><span class="vtag vtag-w">Needs 482 first</span><span class="vtag vtag-g">Employer backed</span></div>
-        </div>
-      </div>
-
-      <div class="sec">Points estimate (Subclass 189/190)</div>
-      <div class="pts-table">
-        <table>
-          <thead><tr><th>Factor</th><th>Detail</th><th>Pts</th></tr></thead>
-          <tbody>
-            <tr><td>Age (40)</td><td style="color:var(--mut2)">40–44 = 0 pts. Main challenge.</td><td class="pts-val" style="color:var(--ph)">⚠ 0</td></tr>
-            <tr><td>English</td><td style="color:var(--mut2)">IELTS/PTE 7.0 = 10 pts; 8.0 = 20 pts. Not tested yet.</td><td class="pts-val" style="color:var(--ph)">TBD</td></tr>
-            <tr><td>Work exp.</td><td style="color:var(--mut2)">8+ yrs as Telecom Engineer</td><td class="pts-val" style="color:var(--au)">+15</td></tr>
-            <tr><td>Education</td><td style="color:var(--mut2)">Bachelor's degree (Engineers Australia)</td><td class="pts-val" style="color:var(--au)">+15</td></tr>
-            <tr><td>State nom.</td><td style="color:var(--mut2)">VIC, QLD, WA nominate Telecom Engineers</td><td class="pts-val" style="color:var(--ph)">+5</td></tr>
-            <tr><td><strong>Total (with IELTS 7.0)</strong></td><td style="color:var(--mut2)">After English test + state nomination</td><td class="pts-val" style="color:var(--visa)">65–70 ✅</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="warn-box">⚠️ <strong style="color:var(--ph)">Age is the key constraint.</strong> At 40, MJP scores 0 age points. <strong>Booking PTE Academic is the single highest-leverage action he can take right now</strong> — a 7.0+ score adds 10 points, and combined with state nomination (+5) he reaches 65 points.</div>
-
-      <div class="sec">Action plan</div>
-      <div class="steps">
-        <div class="step"><div class="step-num">1</div><div><div class="step-title">Skills Assessment — Engineers Australia</div><div class="step-body">ANZSCO 263311 via Migration Skills Assessment (MSA). Takes 3–6 months. <a href="https://www.engineersaustralia.org.au/skills-assessment" target="_blank">engineersaustralia.org.au</a></div></div></div>
-        <div class="step"><div class="step-num">2</div><div><div class="step-title">Book PTE Academic or IELTS</div><div class="step-body">Target 7.0+ (10 pts) or 8.0+ (20 pts). PTE is faster, popular with Filipino applicants. <a href="https://www.pearsonpte.com" target="_blank">pearsonpte.com</a></div></div></div>
-        <div class="step"><div class="step-num">3</div><div><div class="step-title">Lodge EOI via SkillSelect</div><div class="step-body">Once skills assessment and English test are done. <a href="https://immi.homeaffairs.gov.au/visas/working-in-australia/skillselect" target="_blank">immi.homeaffairs.gov.au</a></div></div></div>
-        <div class="step"><div class="step-num">4</div><div><div class="step-title">Apply for State Nomination (190)</div><div class="step-body">Victoria, Queensland, and WA regularly nominate Telecommunications Engineers. The +5 points could be decisive.</div></div></div>
-        <div class="step"><div class="step-num">5</div><div><div class="step-title">Apply for AU jobs in parallel (482)</div><div class="step-body">Actively apply on Seek and LinkedIn while EOI is in the pool. 482 sponsorship is often the fastest route — converts to PR via 186 after 2–3 years.</div></div></div>
-        <div class="step"><div class="step-num">6</div><div><div class="step-title">Consult a MARA Migration Agent</div><div class="step-body"><a href="https://www.mara.gov.au" target="_blank">mara.gov.au</a> — given the family of 6, one consultation is worth it to review full points and family visa implications.</div></div></div>
-      </div>
-    </div>
-
-  </div><!-- /content -->
-
-  <!-- BOTTOM NAV -->
-  <nav class="bottom-nav">
-    <button class="nav-btn active ph" id="nav-ph" onclick="switchTab('ph')">
-      <span class="nav-icon">🇵🇭</span>Philippines
-    </button>
-    <button class="nav-btn" id="nav-au" onclick="switchTab('au')">
-      <span class="nav-icon">🇦🇺</span>Australia
-    </button>
-    <button class="nav-btn" id="nav-visa" onclick="switchTab('visa')">
-      <span class="nav-icon">🛂</span>Visa Guide
-    </button>
-  </nav>
-
-</div><!-- /app -->
-
-<!-- COVER LETTER MODAL -->
-<div class="modal-overlay" id="cl-modal" style="display:none" onclick="if(event.target===this)closeCL()">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-head">
-      <div class="modal-head-row">
-        <div>
-          <h2>✍️ Cover Letter</h2>
-          <p id="cl-subtitle">Generating...</p>
-        </div>
-        <button class="modal-close" onclick="closeCL()">✕</button>
-      </div>
-    </div>
-    <div class="modal-body" id="cl-body">
-      <div class="loading"><div class="spinner" id="cl-spinner" style="border-top-color:var(--visa)"></div><div>Drafting cover letter…</div></div>
+    <div class="tips" id="tips" style="display:none">
+      <div class="tips-title">Search Tips</div>
+      <div class="tip"><span class="tip-arrow">→</span><span>Tap <strong>Open ↗</strong> next to any role to go directly to live listings on that board</span></div>
+      <div class="tip"><span class="tip-arrow">→</span><span>On each site, sort by <strong>Date Posted</strong> for freshest results</span></div>
+      <div class="tip"><span class="tip-arrow">→</span><span>Key targets: PLDT/Smart, DITO, Converge ICT, Globe (competitor roles), Ericsson PH, Nokia PH, Huawei PH</span></div>
+      <div class="tip"><span class="tip-arrow">→</span><span>Best areas: Makati, BGC, Muntinlupa, Mandaluyong, Ortigas</span></div>
     </div>
   </div>
 </div>
 
+
 <script>
 
-// ── PASSWORD GATE ──
-// Change this to whatever password you want
-const APP_PASSWORD = 'mjpjobs2026';
 
-function checkPw() {
-  const input = document.getElementById('pw-input');
-  const val = input.value.trim();
-  if (val === APP_PASSWORD) {
-    sessionStorage.setItem('mjp_auth', '1');
-    document.getElementById('pw-gate').style.display = 'none';
-  } else {
-    input.classList.add('error');
-    document.getElementById('pw-err').textContent = 'Incorrect password. Please try again.';
-    input.value = '';
-    input.focus();
-  }
+// Role titles — reviewed against MJP's actual PH telecom experience:
+// Core: senior RF/RAN across NCR (2G-5G), IBS lead, domain manager
+// Service side: VIP complaint mgmt, network KPIs, service quality
+// Planning: network planning (SMC + Globe), LLD review
+// Spectrum: interference analysis, PIM, spectrum monitoring
+const ALL_ROLES = [
+  // ── Best fits — senior management & service roles (most recent Globe experience) ──
+  'Network Service Manager',
+  'Service Quality Manager',
+  'Network Quality Manager',
+  'Network Operations Manager',
+  'Telecom Project Manager',
+  // ── Strong fits — RF/RAN optimization (core of his 13-yr career) ──
+  'Senior Network Optimization Engineer',
+  'Network Optimization Engineer',
+  'Senior RF Engineer',
+  '5G Network Engineer',
+  '5G RAN Engineer',
+  'RAN Engineer',
+  'RF Engineer',
+  // ── Good fits — planning & design (SMC + early Globe) ──
+  'Radio Network Planner',
+  'Network Planning Engineer',
+  'RF Planning Engineer',
+  // ── Specialist fits — IBS, spectrum (dedicated roles at Globe) ──
+  'IBS Engineer',
+  'In-Building Solutions Engineer',
+  'Spectrum Engineer',
+  'Interference Management Engineer',
+  // ── Broader fit ──
+  'Customer Experience Manager – Network',
+];
+
+// Default active — best bets for current PH telecom job market
+const active = new Set([
+  'Network Service Manager',
+  'Service Quality Manager',
+  'Network Operations Manager',
+  'Senior Network Optimization Engineer',
+  'Network Optimization Engineer',
+  'Senior RF Engineer',
+  '5G Network Engineer',
+  'Radio Network Planner',
+]);
+
+const BOARDS = [
+  { key:'jobstreet', logo:'💼', name:'JobStreet Philippines', desc:"PH's #1 board · strong for telco & engineering roles" },
+  { key:'linkedin',  logo:'🔗', name:'LinkedIn Philippines',  desc:'Best for senior & managerial level telecom roles'    },
+  { key:'indeed',    logo:'🔍', name:'Indeed Philippines',    desc:'Wide coverage incl. agency & direct employer posts'  },
+  { key:'kalibrr',   logo:'⭐', name:'Kalibrr',               desc:'AI-matched · DITO, Ericsson PH, Nokia PH post here' },
+];
+
+function buildUrls(role) {
+  const q    = encodeURIComponent(role);
+  const slug = role.toLowerCase().replace(/ /g,'-').replace(/[–—]/g,'-');
+  return {
+    jobstreet: `https://ph.jobstreet.com/${slug}-jobs`,
+    linkedin:  `https://www.linkedin.com/jobs/search/?keywords=${q}&location=Metro%20Manila%2C%20National%20Capital%20Region%2C%20Philippines&sortBy=DD`,
+    indeed:    `https://ph.indeed.com/jobs?q=${q}&l=Metro+Manila&sort=date`,
+    kalibrr:   `https://www.kalibrr.com/job-board/te/${slug}/ph`,
+  };
 }
 
-// Check if already authenticated this session
-if (sessionStorage.getItem('mjp_auth') === '1') {
-  document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('pw-gate').style.display = 'none';
-  });
-}
-
-// ── CONFIG ──
-const RAPIDAPI_KEY = '9e7e8367c2msh02482275225f93ap1656a9jsnb7c9961e9130';
-const JSEARCH_HOST = 'jsearch.p.rapidapi.com';
-
-const MJP_PROFILE = `Candidate: MJP (Mark), Age 40, Filipino
-Recent Role: Mobile Service Manager, Globe Telecom (Jul 2024–Oct 2025)
-Total Experience: 13+ years in telecommunications
-
-Career History:
-- Mobile Service Manager, Globe Telecom (2024–2025): Developed mobile network solutions, shaped network strategy, delivered analytics for executive decision-making. Primary bridge between business and network teams.
-- Regional Lead / Lead Manager, Globe Telecom (2021–2025): Directed VIP/VVIP complaint management team, oversaw spectrum monitoring and PIM projects, managed device type approval, planned network support for large-scale events.
-- Domain Manager, Globe Telecom (2020–2022): Led VVIP/VIP wireless complaint teams, spectrum interference analysis, PIM projects, device type approval, special event deployments.
-- Senior Lead Engineer, Globe Telecom (2019–2020): RAN performance monitoring for NCR Region across 2G/3G/LTE/5G. Cluster optimization, SSV, LLD approval.
-- Senior Lead Engineer, Globe Telecom (2016–2018): Network optimization of Manila thoroughfares, VIP routes, drive testing, parameter optimization.
-- Team Lead / Senior RF Engineer, Globe Telecom (2014–2015): Led NCR IBS Optimization Team — 2G/3G/LTE, parameter creation, traffic balancing, RF acceptance.
-- RF Engineer, Globe Telecom (2012–2014): LTE eRAN feature testing, interoperability trials, CSFB/LTE roaming, HSPA+ deployment, Huawei PRS/Nastar, KPI reporting.
-- 2G/3G Radio Network Planner, San Miguel Corporation (2010–2012): Nominal planning for 1,600+ GSM/UMTS sites in South Luzon.
-Key Skills: RF/RAN optimization, 5G/LTE/3G/2G, KPI improvement (CSSR/DCR/HOSR), spectrum monitoring, PIM, drive testing (TEMS/Nemo/Actix), IBS/DAS, LLD review, VIP complaint management, Aircom Asset, Mapinfo, Huawei EMS.
-Education: Bachelor's degree | Family: Married, 4 children`;
-
-const PH_ROLES = ['RF Network Engineer','Network Optimization Engineer','RAN Engineer','Mobile Network Manager','Service Quality Manager','Telecom Service Manager','Network Performance Manager','Wireless Network Engineer','Senior RF Engineer','5G Network Engineer','Spectrum Engineer','Network Operations Manager'];
-const AU_ROLES = ['Telecommunications Engineer','RF Engineer','RAN Optimization Engineer','Network Performance Engineer','Mobile Network Engineer','Senior Network Engineer','5G Network Engineer','Telecom Service Manager','Network Quality Manager','Radio Network Planner','Wireless Engineer','Field Network Engineer'];
-
-const phActive = new Set(['RF Network Engineer','Mobile Network Manager','Telecom Service Manager','5G Network Engineer']);
-const auActive = new Set(['Telecommunications Engineer','RAN Optimization Engineer','5G Network Engineer','Telecom Service Manager']);
-
-
-// ── SELECT / DESELECT ALL ──
-const PH_ROLES_REF = ['RF Network Engineer','Network Optimization Engineer','RAN Engineer','Mobile Network Manager','Service Quality Manager','Telecom Service Manager','Network Performance Manager','Wireless Network Engineer','Senior RF Engineer','5G Network Engineer','Spectrum Engineer','Network Operations Manager'];
-const AU_ROLES_REF = ['Telecommunications Engineer','RF Engineer','RAN Optimization Engineer','Network Performance Engineer','Mobile Network Engineer','Senior Network Engineer','5G Network Engineer','Telecom Service Manager','Network Quality Manager','Radio Network Planner','Wireless Engineer','Field Network Engineer'];
-
-function selectAll(region) {
-  const activeSet = region === 'ph' ? phActive : auActive;
-  const allRoles = region === 'ph' ? PH_ROLES_REF : AU_ROLES_REF;
-  allRoles.forEach(r => activeSet.add(r));
-  rebuildRoleTags(region);
-}
-
-function deselectAll(region) {
-  const activeSet = region === 'ph' ? phActive : auActive;
-  activeSet.clear();
-  rebuildRoleTags(region);
-}
-
-function rebuildRoleTags(region) {
-  const gridId = region + '-role-grid';
-  const activeSet = region === 'ph' ? phActive : auActive;
-  const allRoles = region === 'ph' ? PH_ROLES_REF : AU_ROLES_REF;
-  document.getElementById(gridId).innerHTML = '';
-  renderRoles(gridId, allRoles, activeSet, region);
-}
-
-// ── RENDER ROLE TAGS ──
-function renderRoles(gridId, roles, activeSet, region) {
-  const el = document.getElementById(gridId);
-  roles.forEach(r => {
+function renderRoles() {
+  const grid = document.getElementById('role-grid');
+  grid.innerHTML = '';
+  ALL_ROLES.forEach(r => {
     const b = document.createElement('button');
-    b.className = 'role-tag' + (activeSet.has(r) ? ` on-${region}` : '');
-    b.textContent = (activeSet.has(r) ? '✓ ' : '') + r;
+    b.className = 'role-tag' + (active.has(r) ? ' on' : '');
+    b.textContent = (active.has(r) ? '✓ ' : '') + r;
     b.onclick = () => {
-      if (activeSet.has(r)) { activeSet.delete(r); b.className = 'role-tag'; b.textContent = r; }
-      else { activeSet.add(r); b.className = `role-tag on-${region}`; b.textContent = '✓ ' + r; }
+      if (active.has(r)) { active.delete(r); b.className='role-tag'; b.textContent=r; }
+      else { active.add(r); b.className='role-tag on'; b.textContent='✓ '+r; }
     };
-    el.appendChild(b);
+    grid.appendChild(b);
   });
 }
 
-// ── TAB SWITCHING ──
-function switchTab(id) {
-  ['ph','au','visa'].forEach(t => {
-    document.getElementById('panel-' + t).classList.toggle('active', t === id);
-    const nav = document.getElementById('nav-' + t);
-    nav.classList.toggle('active', t === id);
-    nav.classList.toggle(t, t === id);
-  });
-}
+function selectAll()   { ALL_ROLES.forEach(r => active.add(r)); renderRoles(); }
+function deselectAll() { active.clear(); renderRoles(); }
 
+function generateLinks() {
+  const roles = [...active];
+  if (!roles.length) { showToast('Select at least one role first'); return; }
 
-function buildSearchLinks(region, roles) {
-  const q = encodeURIComponent(roles[0] || 'Telecommunications Engineer');
-  const qMulti = encodeURIComponent((roles.slice(0,2).join(' ')));
-  if (region === 'ph') {
-    return [
-      ['JobStreet PH', `https://ph.jobstreet.com/${(roles[0]||'telecommunications-engineer').toLowerCase().replace(/ /g,'-')}-jobs`],
-      ['LinkedIn PH', `https://www.linkedin.com/jobs/search/?keywords=${qMulti}&location=Metro%20Manila%2C%20Philippines&sortBy=DD`],
-      ['Indeed PH', `https://ph.indeed.com/jobs?q=${q}&l=Metro+Manila&sort=date`],
-    ];
-  } else {
-    return [
-      ['Seek AU', `https://www.seek.com.au/${(roles[0]||'telecommunications-engineer').toLowerCase().replace(/ /g,'-')}-jobs/in-All-Melbourne`],
-      ['LinkedIn AU', `https://www.linkedin.com/jobs/search/?keywords=${qMulti}&location=Melbourne%2C+Australia&sortBy=DD`],
-      ['Indeed AU', `https://au.indeed.com/jobs?q=${q}&l=Melbourne%2C+VIC&sort=date`],
-    ];
-  }
-}
-
-function renderSearchLinks(region, roles, wrap) {
-  const encRole = r => encodeURIComponent(r);
-  const slug    = r => r.toLowerCase().replace(/ /g, '-');
-  const primary = roles[0] || 'Telecommunications Engineer';
-  const multi   = roles.slice(0,3).join(' ');
-
-  const boards = region === 'ph' ? [
-    {
-      logo: '💼', name: 'JobStreet Philippines',
-      desc: "PH's #1 job board · 75,000+ listings · telco, engineering, IT",
-      url: `https://ph.jobstreet.com/${slug(primary)}-jobs`,
-      color: 'var(--ph)',
-    },
-    {
-      logo: '🔗', name: 'LinkedIn Philippines',
-      desc: 'Best for senior & managerial roles · Manila, Makati, BGC',
-      url: `https://www.linkedin.com/jobs/search/?keywords=${encRole(multi)}&location=Metro%20Manila%2C%20National%20Capital%20Region%2C%20Philippines&sortBy=DD`,
-      color: 'var(--ph)',
-    },
-    {
-      logo: '🔍', name: 'Indeed Philippines',
-      desc: 'Wide coverage incl. agency & direct employer listings',
-      url: `https://ph.indeed.com/jobs?q=${encRole(primary)}&l=Metro+Manila&sort=date`,
-      color: 'var(--ph)',
-    },
-    {
-      logo: '⭐', name: 'Kalibrr',
-      desc: 'AI-matched roles · popular with Ericsson, Nokia, DITO',
-      url: `https://www.kalibrr.com/job-board/te/${slug(primary)}/ph`,
-      color: 'var(--ph)',
-    },
-  ] : [
-    {
-      logo: '🦘', name: 'Seek Australia',
-      desc: "AU's #1 job board · Telstra, Optus, Ericsson AU",
-      url: `https://www.seek.com.au/${slug(primary)}-jobs/in-All-Melbourne`,
-      color: 'var(--au)',
-    },
-    {
-      logo: '🔗', name: 'LinkedIn Australia',
-      desc: 'Best for senior telecom engineer & manager roles',
-      url: `https://www.linkedin.com/jobs/search/?keywords=${encRole(multi)}&location=Melbourne%2C+Victoria%2C+Australia&sortBy=DD`,
-      color: 'var(--au)',
-    },
-    {
-      logo: '🔍', name: 'Indeed Australia',
-      desc: 'Wide coverage incl. subcontractors & specialist firms',
-      url: `https://au.indeed.com/jobs?q=${encRole(primary)}&l=Melbourne%2C+VIC&sort=date`,
-      color: 'var(--au)',
-    },
-  ];
-
-  // Show active roles bar
-  const chipsHtml = roles.map(r => `<span class="active-role-chip">${r}</span>`).join('');
+  const wrap = document.getElementById('results');
+  const chipsHtml = roles.map(r => `<span class="role-chip">${esc(r)}</span>`).join('');
 
   let html = `
-    <div class="active-roles-bar">
-      <div class="active-roles-label" style="font-family:monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ph);margin-bottom:6px;">
-        Searching for
-      </div>
-      <div class="active-roles-chips">${chipsHtml}</div>
+    <div class="roles-bar">
+      <div class="roles-bar-label">Searching for ${roles.length} role${roles.length>1?'s':''}</div>
+      <div class="roles-chips">${chipsHtml}</div>
     </div>
     <div class="board-cards">`;
 
-  boards.forEach(b => {
-    html += `
-      <a class="board-launch-card ph-card" href="${b.url}" target="_blank" rel="noopener noreferrer">
-        <div class="board-logo">${b.logo}</div>
-        <div class="board-info">
-          <div class="board-info-name">${b.name}</div>
-          <div class="board-info-desc">${b.desc}</div>
+  BOARDS.forEach(board => {
+    const rowsHtml = roles.map(role => {
+      const url = buildUrls(role)[board.key];
+      const safeRole = role.replace(/'/g,"\\'");
+      const safeBoardName = board.name.replace(/'/g,"\\'");
+      return `<div class="role-link-row">
+        <span class="role-link-label">${esc(role)}</span>
+        <a class="open-btn" href="${esc(url)}" target="_blank" rel="noopener noreferrer">Open ↗</a>
+      </div>`;
+    }).join('');
+
+    html += `<div class="board-card">
+      <div class="board-header">
+        <div class="board-logo">${board.logo}</div>
+        <div>
+          <div class="board-name">${board.name}</div>
+          <div class="board-desc">${board.desc}</div>
         </div>
-        <div class="board-arrow">›</div>
-      </a>`;
+      </div>
+      <div class="role-links">${rowsHtml}</div>
+    </div>`;
   });
 
-  html += `</div>
-    <div style="margin-top:14px;font-size:11px;color:var(--mut);text-align:center;line-height:1.6">
-      Each board opens in a new tab with your search pre-filled.<br>
-      Sort by <strong>Date</strong> on each site for the freshest listings.
-    </div>`;
-
+  html += '</div>';
   wrap.innerHTML = html;
+  document.getElementById('tips').style.display = 'block';
 }
 
-function copyAndToast(url) {
-  navigator.clipboard.writeText(url).then(() => showToast('✅ Link copied — paste into your browser!'));
-}
 
-async function doSearch(region) {
-  const activeSet = region === 'ph' ? phActive : auActive;
-  const btn = document.getElementById(region + '-btn');
-  const wrap = document.getElementById(region + '-results');
-  const roles = [...activeSet];
 
-  if (!roles.length) { showToast('Select at least one role title'); return; }
 
-  // Philippines: Google for Jobs has very limited PH coverage — use direct search links
-  if (region === 'ph') {
-    renderSearchLinks('ph', roles, wrap);
-    return;
-  }
 
-  // Australia: use JSearch (Google for Jobs has good AU coverage)
-  btn.disabled = true;
-  btn.textContent = 'Searching…';
-  wrap.innerHTML = `<div class="loading"><div class="spinner" style="border-top-color:var(--au)"></div><div>Fetching live listings…</div></div>`;
 
-  // Simple, reliable query format for JSearch
-  const primaryRole = roles[0];
-  const url = `https://${JSEARCH_HOST}/search?query=${encodeURIComponent(primaryRole + ' in Melbourne Australia')}&page=1&num_pages=2&date_posted=all`;
 
-  try {
-    const res = await fetch(url, { headers: { 'x-rapidapi-host': JSEARCH_HOST, 'x-rapidapi-key': RAPIDAPI_KEY } });
-    if (!res.ok) throw new Error('API ' + res.status);
-    const data = await res.json();
-    let jobs = (data.data || []).sort((a,b) => (b.job_posted_at_timestamp||0) - (a.job_posted_at_timestamp||0));
 
-    if (!jobs.length) {
-      // Retry with generic telecom query
-      const res2 = await fetch(`https://${JSEARCH_HOST}/search?query=${encodeURIComponent('telecommunications engineer Melbourne Australia')}&page=1&num_pages=3&date_posted=all`,
-        { headers: { 'x-rapidapi-host': JSEARCH_HOST, 'x-rapidapi-key': RAPIDAPI_KEY } });
-      const data2 = await res2.json();
-      jobs = (data2.data || []).sort((a,b) => (b.job_posted_at_timestamp||0) - (a.job_posted_at_timestamp||0));
-    }
-
-    if (!jobs.length) {
-      // JSearch also came up empty — fall back to search links
-      wrap.innerHTML = `<div class="empty" style="text-align:left;padding:16px">
-        <div style="font-weight:700;margin-bottom:8px">No live listings found via API right now.</div>
-        <div style="font-size:12px;color:var(--mut2);margin-bottom:14px">Use these direct links to search on the actual job boards:</div>
-      </div>`;
-      const linksWrap = document.createElement('div');
-      wrap.appendChild(linksWrap);
-      renderSearchLinks('au', roles, linksWrap);
-    } else {
-      renderJobs(jobs, wrap, 'au', roles);
-    }
-  } catch(e) {
-    const msg = e.message.includes('429') ? 'Rate limit reached — wait a minute and try again.' : 'Could not fetch: ' + e.message;
-    wrap.innerHTML = `<div class="err-box">⚠️ ${msg}</div>`;
-    // Still show search links below the error
-    const linksWrap = document.createElement('div');
-    wrap.appendChild(linksWrap);
-    renderSearchLinks('au', roles, linksWrap);
-  }
-
-  btn.disabled = false;
-  btn.textContent = '🔄 Refresh';
-}
-
-// ── COVER LETTER ──
-function openCL(title, company, location, desc, region) {
-  document.getElementById('cl-subtitle').textContent = title + ' — ' + company;
-  document.getElementById('cl-body').innerHTML = '<div class="loading"><div class="spinner" style="border-top-color:var(--visa)"></div><div>Drafting cover letter…</div></div>';
-  document.getElementById('cl-modal').style.display = 'flex';
-  generateCL(title, company, location, desc, region);
-}
-
-async function generateCL(title, company, location, desc, region) {
-  const country = region === 'ph' ? 'Philippines' : 'Australia';
-  const prompt = `You are a professional cover letter writer. Draft a tailored cover letter.
-
-CANDIDATE:
-${MJP_PROFILE}
-
-JOB:
-Title: ${title}
-Company: ${company}
-Location: ${location}, ${country}
-Description: ${desc}
-
-Write a compelling 3–4 paragraph cover letter (~300 words). Strong opening hook. Highlight 2–3 of MJP's most relevant achievements matching this role. Emphasise 5G, LTE, RAN optimization where relevant. For AU roles, acknowledge intention to relocate. Professional but human tone. No placeholders. Sign off as "MJP".`;
-
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 900, messages: [{ role: 'user', content: prompt }] })
-    });
-    const data = await res.json();
-    const text = data?.content?.[0]?.text || 'Error generating cover letter.';
-    document.getElementById('cl-body').innerHTML = `
-      <div class="cl-text" id="cl-text">${esc(text)}</div>
-      <div class="modal-actions">
-        <button class="modal-action-btn btn-visa" onclick="copyCL()">📋 Copy to Clipboard</button>
-        <button class="modal-action-btn btn-ghost" onclick="generateCL('${title.replace(/'/g,"\\'")}','${company.replace(/'/g,"\\'")}','${location.replace(/'/g,"\\'")}','${desc.replace(/'/g,"\\'")}','${region}')">🔄 Regenerate</button>
-      </div>`;
-  } catch(e) {
-    document.getElementById('cl-body').innerHTML = '<div class="err-box">⚠️ Error generating cover letter. Please try again.</div>';
-  }
-}
-
-function copyCL() {
-  const text = document.getElementById('cl-text')?.textContent || '';
-  navigator.clipboard.writeText(text).then(() => showToast('✅ Cover letter copied!'));
-}
-
-function closeCL() { document.getElementById('cl-modal').style.display = 'none'; }
-
-// ── HELPERS ──
-function copyLink(url) {
-  navigator.clipboard.writeText(url).then(() => showToast('✅ Link copied — paste into browser to apply'));
-}
-
-function fmtSalary(j) {
-  const mn = j.job_min_salary, mx = j.job_max_salary, p = j.job_salary_period, cur = j.job_salary_currency;
-  if (!mn && !mx) return null;
-  const sym = cur === 'PHP' ? '₱' : cur === 'AUD' ? 'A$' : '$';
-  const per = p === 'YEAR' ? '/yr' : p === 'MONTH' ? '/mo' : p === 'HOUR' ? '/hr' : '';
-  const f = n => n >= 1000 ? Math.round(n/1000)+'k' : String(Math.round(n));
-  return mn && mx ? `${sym}${f(mn)}–${sym}${f(mx)}${per}` : mx ? `Up to ${sym}${f(mx)}${per}` : `From ${sym}${f(mn)}${per}`;
-}
 
 function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 function showToast(msg) {
-  const t = document.createElement('div');
-  t.className = 'toast';
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(() => t.remove(), 2400);
+  const t=document.createElement('div'); t.className='toast'; t.textContent=msg;
+  document.body.appendChild(t); setTimeout(()=>t.remove(),2400);
 }
 
-// ── INIT ──
-renderRoles('ph-role-grid', PH_ROLES, phActive, 'ph');
-renderRoles('au-role-grid', AU_ROLES, auActive, 'au');
+renderRoles();
 </script>
 </body>
 </html>
