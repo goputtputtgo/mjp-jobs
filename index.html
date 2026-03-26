@@ -263,6 +263,56 @@ a{color:var(--au);}
   cursor:pointer; font-family:inherit; transition:all .15s;
 }
 .sel-all-btn:active { opacity:.7; }
+
+/* ── PH LINK LAUNCHER ── */
+.launcher-intro {
+  background:var(--surf);border:1px solid var(--bdr);border-radius:12px;
+  padding:13px 14px;margin-bottom:18px;font-size:12.5px;color:var(--mut2);line-height:1.6;
+}
+.launcher-intro strong { color:var(--txt); }
+.launcher-query-box {
+  background:var(--surf2);border:1px solid var(--bdr2);border-radius:10px;
+  padding:10px 13px;margin:10px 0 18px;font-family:monospace;font-size:11px;
+  color:var(--ph);line-height:1.6;word-break:break-all;
+}
+.board-cards { display:flex;flex-direction:column;gap:10px; }
+.board-launch-card {
+  display:flex;align-items:center;gap:14px;
+  background:var(--surf);border:1px solid var(--bdr);border-radius:14px;
+  padding:14px 16px;text-decoration:none;color:var(--txt);
+  transition:all .18s;-webkit-tap-highlight-color:transparent;
+  cursor:pointer;
+}
+.board-launch-card:active { opacity:.75;transform:scale(.98); }
+.board-launch-card.ph-card:hover,
+.board-launch-card.ph-card:focus { border-color:rgba(245,158,11,.45);background:rgba(245,158,11,.05); }
+.board-logo {
+  width:44px;height:44px;border-radius:12px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;border:1px solid var(--bdr2);background:var(--surf2);
+}
+.board-info { flex:1;min-width:0; }
+.board-info-name { font-weight:700;font-size:15px;margin-bottom:2px; }
+.board-info-desc { font-size:11.5px;color:var(--mut2);line-height:1.4; }
+.board-arrow {
+  font-size:20px;color:var(--ph);flex-shrink:0;
+  font-weight:300;
+}
+.active-roles-bar {
+  margin-bottom:16px;padding:10px 13px;
+  background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);
+  border-radius:10px;
+}
+.active-roles-bar-label {
+  font-family:monospace;font-size:10px;text-transform:uppercase;
+  letter-spacing:.08em;color:var(--ph);margin-bottom:6px;
+}
+.active-roles-chips { display:flex;flex-wrap:wrap;gap:5px; }
+.active-role-chip {
+  font-size:11px;padding:3px 9px;border-radius:6px;
+  background:rgba(245,158,11,.12);color:var(--ph);
+  border:1px solid rgba(245,158,11,.25);
+}
 </style>
 </head>
 <body>
@@ -306,16 +356,21 @@ a{color:var(--au);}
         <button class="sel-all-btn" onclick="deselectAll('ph')">✕ Deselect All</button>
       </div>
       <div class="role-grid" id="ph-role-grid"></div>
-      <button class="search-btn ph" id="ph-btn" onclick="doSearch('ph')">🔍 Get Search Links</button>
+      <button class="search-btn ph" id="ph-btn" onclick="doSearch('ph')">🔍 Generate Search Links</button>
       <div id="ph-results" style="margin-top:18px">
-        <div class="empty">Select roles above and tap <strong>Search Live Jobs</strong> to load real listings from JobStreet PH, Indeed PH &amp; LinkedIn.</div>
+        <div class="empty">
+          <div style="font-size:28px;margin-bottom:10px">🇵🇭</div>
+          <div style="font-weight:700;margin-bottom:6px">Ready to search</div>
+          Select the role titles you want above, then tap <strong>Generate Search Links</strong> to get one-tap links to JobStreet PH, LinkedIn, Indeed PH and Kalibrr — all pre-filtered for your roles.
+        </div>
       </div>
       <div class="tips" id="ph-tips">
-        <div class="tips-title">🇵🇭 Philippines Tips</div>
-        <div class="tip"><span class="tip-arrow" style="color:var(--ph)">→</span><span>Tap <strong>Get Search Links</strong> — the app generates pre-filtered search URLs for JobStreet PH, LinkedIn, and Indeed PH, ready to copy and open</span></div>
+        <div class="tips-title">🇵🇭 How to use this tab</div>
+        <div class="tip"><span class="tip-arrow" style="color:var(--ph)">→</span><span>Select the role titles you want above, then tap <strong>Generate Search Links</strong></span></div>
+        <div class="tip"><span class="tip-arrow" style="color:var(--ph)">→</span><span>Tap any board card — it opens that job board in a new tab with your roles already searched</span></div>
+        <div class="tip"><span class="tip-arrow" style="color:var(--ph)">→</span><span>On each site, filter by <strong>Date Posted</strong> to see the freshest listings first</span></div>
         <div class="tip"><span class="tip-arrow" style="color:var(--ph)">→</span><span>Key targets: PLDT/Smart, DITO, Converge ICT, Ericsson PH, Nokia PH, Huawei PH</span></div>
         <div class="tip"><span class="tip-arrow" style="color:var(--ph)">→</span><span>Best areas: Makati, BGC (Taguig), Muntinlupa, Mandaluyong</span></div>
-        <div class="tip"><span class="tip-arrow" style="color:var(--ph)">→</span><span>Tap <strong>✍ Cover Letter</strong> on any listing for an AI-drafted letter using MJP's full CV</span></div>
       </div>
     </div>
 
@@ -561,28 +616,87 @@ function buildSearchLinks(region, roles) {
 }
 
 function renderSearchLinks(region, roles, wrap) {
-  const links = buildSearchLinks(region, roles);
-  const rcol = region === 'ph' ? 'var(--ph)' : 'var(--au)';
+  const encRole = r => encodeURIComponent(r);
+  const slug    = r => r.toLowerCase().replace(/ /g, '-');
+  const primary = roles[0] || 'Telecommunications Engineer';
+  const multi   = roles.slice(0,3).join(' ');
+
+  const boards = region === 'ph' ? [
+    {
+      logo: '💼', name: 'JobStreet Philippines',
+      desc: "PH's #1 job board · 75,000+ listings · telco, engineering, IT",
+      url: `https://ph.jobstreet.com/${slug(primary)}-jobs`,
+      color: 'var(--ph)',
+    },
+    {
+      logo: '🔗', name: 'LinkedIn Philippines',
+      desc: 'Best for senior & managerial roles · Manila, Makati, BGC',
+      url: `https://www.linkedin.com/jobs/search/?keywords=${encRole(multi)}&location=Metro%20Manila%2C%20National%20Capital%20Region%2C%20Philippines&sortBy=DD`,
+      color: 'var(--ph)',
+    },
+    {
+      logo: '🔍', name: 'Indeed Philippines',
+      desc: 'Wide coverage incl. agency & direct employer listings',
+      url: `https://ph.indeed.com/jobs?q=${encRole(primary)}&l=Metro+Manila&sort=date`,
+      color: 'var(--ph)',
+    },
+    {
+      logo: '⭐', name: 'Kalibrr',
+      desc: 'AI-matched roles · popular with Ericsson, Nokia, DITO',
+      url: `https://www.kalibrr.com/job-board/te/${slug(primary)}/ph`,
+      color: 'var(--ph)',
+    },
+  ] : [
+    {
+      logo: '🦘', name: 'Seek Australia',
+      desc: "AU's #1 job board · Telstra, Optus, Ericsson AU",
+      url: `https://www.seek.com.au/${slug(primary)}-jobs/in-All-Melbourne`,
+      color: 'var(--au)',
+    },
+    {
+      logo: '🔗', name: 'LinkedIn Australia',
+      desc: 'Best for senior telecom engineer & manager roles',
+      url: `https://www.linkedin.com/jobs/search/?keywords=${encRole(multi)}&location=Melbourne%2C+Victoria%2C+Australia&sortBy=DD`,
+      color: 'var(--au)',
+    },
+    {
+      logo: '🔍', name: 'Indeed Australia',
+      desc: 'Wide coverage incl. subcontractors & specialist firms',
+      url: `https://au.indeed.com/jobs?q=${encRole(primary)}&l=Melbourne%2C+VIC&sort=date`,
+      color: 'var(--au)',
+    },
+  ];
+
+  // Show active roles bar
+  const chipsHtml = roles.map(r => `<span class="active-role-chip">${r}</span>`).join('');
+
   let html = `
-    <div style="margin-top:4px">
-      <div style="font-size:11px;color:var(--mut);font-family:monospace;margin-bottom:14px;padding:9px 12px;background:var(--surf);border:1px solid var(--bdr);border-radius:8px;line-height:1.6">
-        ℹ️ Tap a board below to get your search URL, then paste it into your browser.<br>
-        Results open directly on the job board — real, live listings.
-      </div>`;
-  links.forEach(([name, url]) => {
+    <div class="active-roles-bar">
+      <div class="active-roles-label" style="font-family:monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ph);margin-bottom:6px;">
+        Searching for
+      </div>
+      <div class="active-roles-chips">${chipsHtml}</div>
+    </div>
+    <div class="board-cards">`;
+
+  boards.forEach(b => {
     html += `
-      <div style="margin-bottom:10px;background:var(--surf);border:1px solid var(--bdr);border-radius:12px;padding:13px 14px">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
-          <span style="font-weight:700;font-size:14px">${name}</span>
-          <button onclick="copyAndToast('${url.replace(/'/g, "\\'")}')"
-            style="padding:9px 16px;border-radius:8px;border:none;background:${rcol};color:var(--bg);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit">
-            📋 Copy Link
-          </button>
+      <a class="board-launch-card ph-card" href="${b.url}" target="_blank" rel="noopener noreferrer">
+        <div class="board-logo">${b.logo}</div>
+        <div class="board-info">
+          <div class="board-info-name">${b.name}</div>
+          <div class="board-info-desc">${b.desc}</div>
         </div>
-        <div style="font-family:monospace;font-size:10px;color:var(--mut2);margin-top:8px;word-break:break-all;line-height:1.5">${url}</div>
-      </div>`;
+        <div class="board-arrow">›</div>
+      </a>`;
   });
-  html += '</div>';
+
+  html += `</div>
+    <div style="margin-top:14px;font-size:11px;color:var(--mut);text-align:center;line-height:1.6">
+      Each board opens in a new tab with your search pre-filled.<br>
+      Sort by <strong>Date</strong> on each site for the freshest listings.
+    </div>`;
+
   wrap.innerHTML = html;
 }
 
