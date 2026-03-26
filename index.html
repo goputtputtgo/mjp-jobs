@@ -498,32 +498,31 @@ function switchTab(id) {
   });
 }
 
-// ── SEARCH ──
-async function doSearch(region) {
-  const activeSet = region === 'ph' ? phActive : auActive;
-  const btn = document.getElementById(region + '-btn');
-  const wrap = document.getElementById(region + '-results');
 
-  if (!activeSet.size) { showToast('Select at least one role title'); return; }
+function buildSearchLinks(region, roles) {
+  const q = encodeURIComponent((roles[0]||'Telecommunications Engineer'));
+  const links = region === 'ph' ? [
+    ['LinkedIn PH', `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent((roles[0]||'').replace(/ /g,'+'))}&location=Metro+Manila`],
+    ['JobStreet PH', `https://ph.jobstreet.com/${q}-jobs`],
+    ['Indeed PH', `https://ph.indeed.com/jobs?q=${q}&l=Metro+Manila`],
+  ] : [
+    ['Seek AU', `https://www.seek.com.au/${q.replace(/%20/g,'-')}-jobs/in-All-Melbourne`],
+    ['LinkedIn AU', `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent((roles[0]||'').replace(/ /g,'+'))}&location=Melbourne`],
+    ['Indeed AU', `https://au.indeed.com/jobs?q=${q}&l=Melbourne`],
+  ];
+  return links.map(([name,url]) =>
+    `<div style="margin-top:8px">
+      <div style="font-size:12px;font-weight:600;color:var(--txt);margin-bottom:4px">${name}</div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <div style="flex:1;background:var(--surf2);border:1px solid var(--bdr2);border-radius:6px;padding:7px 10px;font-family:monospace;font-size:10px;color:var(--mut2);word-break:break-all">${url}</div>
+        <button onclick="navigator.clipboard.writeText('${url}').then(()=>showToast('Copied!'))"
+          style="padding:7px 10px;border-radius:6px;border:none;background:var(--surf2);color:var(--mut2);font-size:11px;cursor:pointer;flex-shrink:0">📋</button>
+      </div>
+    </div>`
+  ).join('');
+}
 
-  btn.disabled = true;
-  btn.textContent = 'Searching…';
-  wrap.innerHTML = `<div class="loading"><div class="spinner" style="border-top-color:${region==='ph'?'var(--ph)':'var(--au)'}"></div><div>Fetching live listings…</div></div>`;
-
-  const query = [...activeSet].slice(0, 3).join(' OR ');
-  const loc = region === 'ph' ? 'Metro Manila Philippines' : 'Melbourne Australia';
-  const country = region === 'ph' ? 'ph' : 'au';
-  const url = `https://${JSEARCH_HOST}/search?query=${encodeURIComponent(query+' in '+loc)}&page=1&num_pages=2&country=${country}&date_posted=month&sort_by=date`;
-
-  try {
-    const res = await fetch(url, { headers: { 'x-rapidapi-host': JSEARCH_HOST, 'x-rapidapi-key': RAPIDAPI_KEY } });
-    if (!res.ok) throw new Error('API ' + res.status);
-    const data = await res.json();
-    const jobs = (data.data || []).sort((a,b) => (b.job_posted_at_timestamp||0) - (a.job_posted_at_timestamp||0));
-
-    if (!jobs.length) {
-      wrap.innerHTML = '<div class="empty">No listings found for these roles. Try selecting different role titles.</div>';
-    } else {
+function renderJobs(jobs, wrap, region, roles) {
       const now = Date.now()/1000;
       let html = `<div class="status-bar">✅ ${jobs.length} real listings · newest first · ${new Date().toLocaleTimeString()}</div>`;
       jobs.forEach(j => {
@@ -574,6 +573,53 @@ async function doSearch(region) {
         </div>`;
       });
       wrap.innerHTML = html;
+}
+
+// ── SEARCH ──
+async function doSearch(region) {
+  const activeSet = region === 'ph' ? phActive : auActive;
+  const btn = document.getElementById(region + '-btn');
+  const wrap = document.getElementById(region + '-results');
+
+  if (!activeSet.size) { showToast('Select at least one role title'); return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Searching…';
+  wrap.innerHTML = `<div class="loading"><div class="spinner" style="border-top-color:${region==='ph'?'var(--ph)':'var(--au)'}"></div><div>Fetching live listings…</div></div>`;
+
+  // Use single most-relevant role for better results, broaden location
+  const roles = [...activeSet];
+  // Try primary role first, fall back to broader telecom term
+  const primaryRole = roles[0] || 'Telecommunications Engineer';
+  const loc = region === 'ph' ? 'Philippines' : 'Australia';
+  const country = region === 'ph' ? 'ph' : 'au';
+  // Keep query simple — JSearch works best with concise queries
+  const query = primaryRole + ' ' + loc;
+  const url = `https://${JSEARCH_HOST}/search?query=${encodeURIComponent(query)}&page=1&num_pages=3&country=${country}&date_posted=all`;
+
+  try {
+    const res = await fetch(url, { headers: { 'x-rapidapi-host': JSEARCH_HOST, 'x-rapidapi-key': RAPIDAPI_KEY } });
+    if (!res.ok) throw new Error('API ' + res.status);
+    const data = await res.json();
+    const jobs = (data.data || []).sort((a,b) => (b.job_posted_at_timestamp||0) - (a.job_posted_at_timestamp||0));
+
+    if (!jobs.length) {
+      // Auto-retry with a broader generic query before giving up
+      const fallbackQuery = region === 'ph' ? 'Telecommunications Engineer Philippines' : 'Telecommunications Engineer Australia';
+      const fallbackUrl = `https://${JSEARCH_HOST}/search?query=${encodeURIComponent(fallbackQuery)}&page=1&num_pages=3&country=${country}&date_posted=all`;
+      const res2 = await fetch(fallbackUrl, { headers: { 'x-rapidapi-host': JSEARCH_HOST, 'x-rapidapi-key': RAPIDAPI_KEY } });
+      const data2 = await res2.json();
+      const jobs2 = (data2.data || []).sort((a,b) => (b.job_posted_at_timestamp||0) - (a.job_posted_at_timestamp||0));
+      if (!jobs2.length) {
+        wrap.innerHTML = '<div class="empty">No listings found right now. JSearch coverage varies by region — try again shortly, or use the search links below.<br><br>' + buildSearchLinks(region, roles) + '</div>';
+        btn.disabled = false; btn.textContent = '🔄 Retry'; return;
+      }
+      // Use fallback results
+      renderJobs(jobs2, wrap, region, roles);
+      showToast('Showing broader telecom results');
+      btn.disabled = false; btn.textContent = '🔄 Refresh'; return;
+    } else {
+      renderJobs(jobs, wrap, region, roles);
     }
   } catch(e) {
     const msg = e.message.includes('429') ? 'Rate limit reached — wait a minute and try again.' : 'Could not fetch listings: ' + e.message;
